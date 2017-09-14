@@ -21,7 +21,7 @@ defmodule Mongo.Ecto.Mixfile do
   defp deps do
     [
       {:mongodb, "~> 0.4.2"},
-      {:ecto, "~> 2.1.0"},
+      {:ecto, "~> 2.2.3"},
       {:dialyze, "~> 0.2.0", only: :dev},
       {:inch_ex, "~> 0.5", only: :docs},
       {:earmark, "~> 1.0", only: :docs},

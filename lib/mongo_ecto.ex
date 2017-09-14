@@ -625,14 +625,16 @@ defmodule Mongo.Ecto do
   defp process_document(document, %{fields: fields, pk: pk}, preprocess) do
     document = Conversions.to_ecto_pk(document, pk)
 
-    Enum.map(fields, fn
-      {:field, name, field} ->
-        preprocess.(field, Map.get(document, Atom.to_string(name)), nil)
-      {:value, value, field} ->
-        preprocess.(field, Conversions.to_ecto_pk(value, pk), nil)
-      field ->
-        preprocess.(field, document, nil)
-    end)
+    values = Enum.map(fields, fn
+                        {:field, name, field} ->
+                          Map.get(document, Atom.to_string(name))
+                        {:value, value, field} ->
+                          Conversions.to_ecto_pk(value, pk)
+                        field ->
+                          document
+             end)
+
+    preprocess.(values)
   end
 
   ## Storage
