@@ -430,6 +430,7 @@ defmodule Mongo.Ecto do
   @doc false
   def loaders(:time,            type), do: [&load_time/1, type]
   def loaders(:date,            type), do: [&load_date/1, type]
+  def loaders(:datetime,        type), do: [&load_datetime/1, type]
   def loaders(:utc_datetime,    type), do: [&load_datetime/1, type]
   def loaders(:naive_datetime,  type), do: [&load_datetime/1, type]
   def loaders(:binary_id,       type), do: [&load_objectid/1, type]
@@ -467,8 +468,9 @@ defmodule Mongo.Ecto do
   @doc false
   def dumpers(:time,           type), do: [type, &dump_time/1]
   def dumpers(:date,           type), do: [type, &dump_date/1]
-  def dumpers(:utc_datetime,   type), do: [type, &dump_utc_datetime/1]
-  def dumpers(:naive_datetime, type), do: [type, &dump_naive_datetime/1]
+  def dumpers(:datetime,       type), do: [type, &dump_datetime/1]
+  def dumpers(:utc_datetime,   type), do: [type, &dump_datetime/1]
+  def dumpers(:naive_datetime, type), do: [type, &dump_datetime/1]
   def dumpers(:binary_id,      type), do: [type, &dump_objectid/1]
   def dumpers(:uuid,           type), do: [type, &dump_binary(&1, :uuid)]
   def dumpers(:binary,         type), do: [type, &dump_binary(&1, :generic)]
@@ -489,7 +491,7 @@ defmodule Mongo.Ecto do
   defp dump_date(_),
     do: :error
 
-  defp dump_utc_datetime({{_, _, _} = date, {h, m, s, ms}}) do
+  defp dump_datetime({{_, _, _} = date, {h, m, s, ms}}) do
     datetime =
       {date, {h, m, s}}
       |> NaiveDateTime.from_erl!({ms, 6})
@@ -497,18 +499,7 @@ defmodule Mongo.Ecto do
 
     {:ok, datetime}
   end
-  defp dump_utc_datetime(_),
-    do: :error
-
-  defp dump_naive_datetime({{_, _, _} = date, {h, m, s, ms}}) do
-    datetime =
-      {date, {h, m, s}}
-      |> NaiveDateTime.from_erl!({ms, 6})
-      |> datetime_from_naive!("Etc/UTC")
-
-    {:ok, datetime}
-  end
-  defp dump_naive_datetime(_),
+  defp dump_datetime(_),
     do: :error
 
   @doc """
